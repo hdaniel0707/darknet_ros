@@ -81,7 +81,7 @@ void YoloObjectDetector::init() {
 
   // Threshold of object detection.
   float thresh;
-  nodeHandle_.param("yolo_model/threshold/value", thresh, (float)0.3);
+nodeHandle_.param("yolo_model/threshold/value", thresh, (float)0.9);
 
   // Path to weights file.
   nodeHandle_.param("yolo_model/weight_file/name", weightsModel, std::string("yolov2-tiny.weights"));
@@ -111,7 +111,7 @@ void YoloObjectDetector::init() {
   }
 
   // Load network.
-  setupNetwork(cfg, weights, data, thresh, detectionNames, numClasses_, 0, 0, 1, 0.5, 0, 0, 0, 0);
+  setupNetwork(cfg, weights, data, 0.9, detectionNames, numClasses_, 0, 0, 1, 0.5, 0, 0, 0, 0);
   yoloThread_ = std::thread(&YoloObjectDetector::yolo, this);
 
   // Initialize publisher and subscriber.
@@ -127,7 +127,7 @@ void YoloObjectDetector::init() {
   int detectionImageQueueSize;
   bool detectionImageLatch;
 
-  nodeHandle_.param("subscribers/camera_reading/topic", cameraTopicName, std::string("/camera/image_raw"));
+  nodeHandle_.param("subscribers/camera_reading/topic", cameraTopicName, std::string("/camera/color/image_raw"));
   nodeHandle_.param("subscribers/camera_reading/queue_size", cameraQueueSize, 1);
   nodeHandle_.param("publishers/object_detector/topic", objectDetectorTopicName, std::string("found_object"));
   nodeHandle_.param("publishers/object_detector/queue_size", objectDetectorQueueSize, 1);
@@ -139,7 +139,7 @@ void YoloObjectDetector::init() {
   nodeHandle_.param("publishers/detection_image/queue_size", detectionImageQueueSize, 1);
   nodeHandle_.param("publishers/detection_image/latch", detectionImageLatch, true);
 
-  imageSubscriber_ = imageTransport_.subscribe(cameraTopicName, cameraQueueSize, &YoloObjectDetector::cameraCallback, this);
+  imageSubscriber_ = imageTransport_.subscribe("/camera/color/image_raw", cameraQueueSize, &YoloObjectDetector::cameraCallback, this);
   objectPublisher_ =
       nodeHandle_.advertise<darknet_ros_msgs::ObjectCount>(objectDetectorTopicName, objectDetectorQueueSize, objectDetectorLatch);
   boundingBoxesPublisher_ =

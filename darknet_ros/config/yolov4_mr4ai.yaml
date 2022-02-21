@@ -1,0 +1,13 @@
+yolo_model:
+
+  config_file:
+    name: yolov4-hd-3class.cfg
+  weight_file:
+    name: yolov4_mr4ai.weights
+  threshold:
+    value: 0.9
+  detection_classes:
+    names:
+      - base
+      - arm
+      - gripper
